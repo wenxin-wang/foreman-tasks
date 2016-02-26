@@ -1,0 +1,17 @@
+---
+- name: load common vars
+  include_vars: vars/common.yml
+
+- name: check os family vars
+  local_action: stat path=vars/{{ansible_os_family}}.yml
+  register: family_vars
+- name: load os family vars
+  include_vars: vars/{{ansible_os_family}}.yml
+  when: family_vars.stat.exists
+
+- name: check distribution vars
+  local_action: stat path=vars/{{ansible_distribution}}.yml
+  register: distribution_vars
+- name: load distribution vars
+  include_vars: vars/{{ansible_distribution}}.yml
+  when: distribution_vars.stat.exists
