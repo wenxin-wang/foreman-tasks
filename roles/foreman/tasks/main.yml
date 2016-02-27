@@ -1,3 +1,9 @@
 ---
-#- include: installer.yml
+- include: "{{item}}"
+  with_first_found:
+    - files:
+        - "{{ansible_distribution}}_packages.yml"
+        - "{{ansible_os_family}}_packages.yml"
+
 - include: answers.yml
+#- include: installer.yml

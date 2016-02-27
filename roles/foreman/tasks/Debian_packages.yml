@@ -1,0 +1,24 @@
+---
+- name: add foreman repo
+  become: true
+  copy:
+    content: |
+      deb http://deb.theforeman.org/ {{ansible_distribution_release}} {{foreman_version}}
+      deb http://deb.theforeman.org/ plugins {{foreman_version}}
+    dest: /etc/apt/sources.list.d/foreman.list
+    mode: 0644
+  register: foreman_repo
+
+- name: add foreman repo apt key
+  become: true
+  apt_key: url=http://deb.theforeman.org/pubkey.gpg state=present
+  when: foreman_repo.changed
+
+- name: apt update
+  become: true
+  apt: update_cache=true
+  when: foreman_repo.changed
+
+- name: install foreman-installer
+  become: true
+  apt: name=foreman-installer state=latest

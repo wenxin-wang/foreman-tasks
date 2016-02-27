@@ -1,2 +1,3 @@
 ---
 foreman_installer_answers_file: /etc/foreman/foreman-installer-answers.yaml
+foreman_version: '1.10'
