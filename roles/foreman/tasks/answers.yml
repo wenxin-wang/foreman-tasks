@@ -3,19 +3,23 @@
   set_fact: foreman_installer_base_answers="{{ lookup('file', 'files/base-answers.yaml') | from_yaml }}"
 
 - name: load custom answers var
-  set_fact: foreman_installer_custom_answers="{{ lookup('file', 'instance/custom-answers.yaml') | from_yaml }}"
+  set_fact: >
+    foreman_installer_custom_answers={{ lookup('file', 'instance/' + custom_answers_file + '.yaml') | from_yaml }}
   register: load_custom
   ignore_errors: True
 
+- debug: msg={{foreman_installer_custom_answers}}
+
 - name: use base answers var
   set_fact: foreman_installer_answers="{{ foreman_installer_base_answers }}"
-  when: load_custom.failed
+  when: >
+    'failed' in load_custom and load_custom.failed
 
 - name: merge answers var
   set_fact: >
-    foreman_installer_answers=
-    {{ foreman_installer_base_answers | combine(foreman_installer_custom_answers, recursive=True) }}
-  when: not load_custom.failed
+    foreman_installer_answers={{ foreman_installer_base_answers | combine(foreman_installer_custom_answers, recursive=True) }}
+  when: >
+    'failed' not in load_custom or not load_custom.failed
 
 - name: generate answers file
   become: true
